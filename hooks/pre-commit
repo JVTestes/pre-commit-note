@@ -1,0 +1,54 @@
+#!/usr/bin/php
+
+<?php
+
+$fileDir = dirname(dirname(__FILE__));
+$vendorDir = dirname(dirname($fileDir));
+
+define('VENDOR_DIR', $vendorDir);
+
+require VENDOR_DIR.'/jv-testes/pre-commit/hooks/pre-commit';
+
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class CodeQualityToolNote extends CodeQualityTool
+{
+    private $output;
+    private $input;
+
+    public function __construct()
+    {
+        parent::__construct('Code Quality Tool Note', '1.0.0');
+    }
+
+    public function doRun(InputInterface $input, OutputInterface $output)
+    {
+        $this->input = $input;
+        $this->output = $output;
+
+        try {
+            parent::doRun($input, $output);
+        } catch (\Exception $exception) {
+            var_dump($exception->getMessage());
+            
+        }
+
+        die();
+        
+        $output->writeln('<info>Good job dude!</info>');
+    }
+
+    private function showAuthorAndHash()
+    {
+        $hash = null;
+        $author = null;
+        exec('git log --pretty=format:"%h" | head -n 1', $hash);
+        exec('git log --pretty=format:"%an" | head -n 1', $author);
+
+        return ['hash' => $hash, 'author' => $author];
+    }
+}
+
+$console = new CodeQualityTool();
+$console->run();

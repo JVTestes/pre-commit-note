@@ -1,0 +1,21 @@
+{
+    "name": "jv-testes/pre-commit-note",
+    "description": "Pre-commit hook",
+    "type": "library",
+    "homepage": "https://github.com/juizmill/pre-commit",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jesus Vieira",
+            "homepage": "https://www.youtube.com/c/CursozendframeworkBr2"
+        }
+    ],
+    "autoload": {
+        "psr-4":{
+            "PreCommitNote\\": ""
+        }
+    },
+    "require": {
+        "jv-testes/pre-commit": "dev-master"
+    }
+}
