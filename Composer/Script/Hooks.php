@@ -2,6 +2,7 @@
 
 namespace PreCommitNote\Composer\Script;
 
+use Composer\Script\Event;
 use PreCommit\Composer\Script\Hooks as PreCommitHooks;
 
 class Hooks extends PreCommitHooks
