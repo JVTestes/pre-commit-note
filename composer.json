@@ -15,8 +15,7 @@
             "PreCommitNote\\": ""
         }
     },
-    "minimum-stability": "dev",
     "require": {
-        "jv-testes/pre-commit": "dev-master"
+        "jv-testes/pre-commit": "1.1.0"
     }
 }
