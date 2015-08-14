@@ -40,4 +40,4 @@ Remembering to set up the hooks
 Custom config
 --------------
 
-Copy arquives `vendor/juizmill/pre-commit/config/*` to [project]
+Copy arquives `vendor/jv-testes/pre-commit/config/*` to [project]
