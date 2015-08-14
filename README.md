@@ -12,11 +12,11 @@ composer.json
 ```bash
 "require-dev": {
     ...
-    "jv-testes/pre-commit-note": "1.0.0"
+    "jv-testes/pre-commit-note": "^1.0"
 }
 ```
 
-`php composer.phar update jv-testes/pre-commit-note 1.0.0`
+`php composer.phar update jv-testes/pre-commit-note ^1.0`
 
 
 **USAGE:**
