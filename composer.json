@@ -2,7 +2,7 @@
     "name": "jv-testes/pre-commit-note",
     "description": "Pre-commit hook",
     "type": "library",
-    "homepage": "https://github.com/juizmill/pre-commit",
+    "homepage": "https://github.com/JVTestes/pre-commit-note",
     "license": "MIT",
     "authors": [
         {
@@ -16,6 +16,7 @@
         }
     },
     "require": {
-        "jv-testes/pre-commit": "dev-master"
+        "maknz/slack": "dev-master",
+        "jv-testes/pre-commit": ">=1.2.0"
     }
 }
