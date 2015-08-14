@@ -10,6 +10,7 @@ define('VENDOR_DIR', $vendorDir);
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use PreCommit\Composer\Script\CodeQualityTool;
+use Maknz\Slack\Client;
 
 class CodeQualityToolNote extends CodeQualityTool
 {
@@ -40,7 +41,8 @@ class CodeQualityToolNote extends CodeQualityTool
         if ($phpLint !== true) {
             $this->output->writeln(sprintf('<error>%s</error>', $phpLint['line']));
             $this->output->writeln(sprintf('<error>%s</error>', $phpLint['error']));
-            $errorPHP += count($fatalError[]);
+            $fatalError[] = $phpLint['error'];
+            $errorPHP += count($phpLint['error']);
         }
 
         if (!isset($xml->run->phpcsfix) || ($xml->run->phpcsfix == 'true')) {
@@ -99,16 +101,29 @@ class CodeQualityToolNote extends CodeQualityTool
         $author = null;
         exec('git config --get user.name', $author);
 
-        $message = 'note A. Good work!';
+        $message = 'note *A*. Good work!';
+        
+        if (($errorPHP >= 1) || ($errorJS >= 1) || ($warningPHP >= 1)) {
+            $message = 'note *B*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
+        }
 
         if (count($fatalError) >= 1) {
-            $message = 'note C. warnings ('.$warningPHP.' in PHP) errors ('.$errorJS.' in JS, '.$errorPHP.' in PHP)';
+            $message = 'note *C*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
         }
 
-        if (($errorPHP >= 1) || ($errorJS >= 1) || ($warningPHP >= 1) && (count($fatalError) <= 0)) {
-            $message = 'note B. warnings ('.$warningPHP.' in PHP) errors ('.$errorJS.' in JS, '.$errorPHP.' in PHP)';
-        }
+        $msgOut = str_replace('`', '', str_replace('*', '', $message));
+        
+        $output->writeln('<info>Commit '.$author[0].':'.$msgOut.'</info>');
+        
+        if (!isset($xml->run->slack) || ($xml->run->slack == 'true') && (isset($xml->slackConfig))) {
+            $settings = [
+                'username' => strval($xml->slackConfig->username),
+                'channel' => strval($xml->slackConfig->channel),
+                'icon' => strval($xml->slackConfig->icon)
+            ];
 
-        $output->writeln('<info>Commit '.$author[0].': '.$message.'</info>');
+            $client = new Client(strval($xml->slackConfig->url), $settings);
+            $client->send('Commit *' . $author[0] . '*: ' . $message . '');
+        }
     }
 }
