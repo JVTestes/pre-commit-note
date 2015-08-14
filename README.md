@@ -6,17 +6,17 @@ Checks in our pre-commit hook
 
 The recommended way to install this library is through [Composer](http://getcomposer.org):
 
-add `juizmill/pre-commit-note` as a composer dependency.
+add `jv-testes/pre-commit-note` as a composer dependency.
 
 composer.json
 ```bash
 "require-dev": {
     ...
-    "juizmill/pre-commit-note": "1.0.0"
+    "jv-testes/pre-commit-note": "1.0.0"
 }
 ```
 
-`php composer.phar update juizmill/pre-commit-note 1.0.0`
+`php composer.phar update jv-testes/pre-commit-note 1.0.0`
 
 
 **USAGE:**
