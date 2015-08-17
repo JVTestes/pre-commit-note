@@ -16,7 +16,7 @@
         }
     },
     "require": {
-        "maknz/slack": "^1.7",
+        "maknz/slack": "1.7.*",
         "jv-testes/pre-commit": ">=1.2.0"
     }
 }
