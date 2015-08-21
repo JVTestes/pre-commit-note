@@ -111,6 +111,34 @@ class CodeQualityToolNote extends CodeQualityTool
             $message = 'note *C*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
         }
 
+        if (preg_match("/(\*B\*)|(\*C\*)/", $message)) {
+            $shell = '
+            exec < /dev/tty
+            while true; do
+              read -p "There were some errors in the test, do you still want to commit? (Y/n) " yn
+              if [ "$yn" = "" ]; then
+                yn="Y"
+              fi
+              case $yn in
+                  [Yy] )
+                        echo $yn
+                        break
+                    ;;
+                  [Nn] )
+                        echo $yn
+                        exit 1
+                    ;;
+              esac
+            done
+            ';
+
+            $return = strtolower(trim(shell_exec($shell)));
+
+            if ($return === 'n') {
+                throw new \Exception("\n###### Commit Aborted! #######\n");
+            }
+        }
+   
         $msgOut = str_replace('`', '', str_replace('*', '', $message));
         
         $output->writeln('<info>Commit '.$author[0].':'.$msgOut.'</info>');
