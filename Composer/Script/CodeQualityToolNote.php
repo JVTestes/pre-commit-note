@@ -2,11 +2,6 @@
 
 namespace PreCommitNote\Composer\Script;
 
-$fileDir = dirname(dirname(__FILE__));
-$vendorDir = dirname(dirname(dirname(dirname($fileDir))));
-
-define('VENDOR_DIR', $vendorDir);
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use PreCommit\Composer\Script\CodeQualityTool;
@@ -19,13 +14,6 @@ class CodeQualityToolNote extends CodeQualityTool
         $this->input = $input;
         $this->output = $output;
 
-        $xml = null;
-
-        $config = dirname(VENDOR_DIR).DIRECTORY_SEPARATOR.'config.xml';
-        if (file_exists($config)) {
-            $xml = simplexml_load_file($config);
-        }
-        
         $archive = null;
         $fatalError = [];
         $errorJS = 0;
@@ -45,7 +33,7 @@ class CodeQualityToolNote extends CodeQualityTool
             $errorPHP += count($phpLint['error']);
         }
 
-        if (!isset($xml->run->phpcsfix) || ($xml->run->phpcsfix == 'true')) {
+        if (!isset($this->config->run->phpcsfix) || ($this->config->run->phpcsfix == 'true')) {
             $output->writeln('<info>Checking code style</info>');
             $codeStyle = $this->codeStyle($files);
             if ($codeStyle !== true) {
@@ -91,7 +79,7 @@ class CodeQualityToolNote extends CodeQualityTool
             $warningPHP += count($explode);
         }
 
-        if (!isset($xml->run->phpunit) || ($xml->run->phpunit == 'true')) {
+        if (!isset($this->config->run->phpunit) || ($this->config->run->phpunit == 'true')) {
             $output->writeln('<info>Running unit tests</info>');
             if (!$this->unitTests()) {
                 throw new \Exception('Fix the fucking unit tests!');
@@ -138,19 +126,19 @@ class CodeQualityToolNote extends CodeQualityTool
                 throw new \Exception("\n###### Commit Aborted! #######\n");
             }
         }
-   
+
         $msgOut = str_replace('`', '', str_replace('*', '', $message));
         
         $output->writeln('<info>Commit '.$author[0].':'.$msgOut.'</info>');
         
-        if (!isset($xml->run->slack) || ($xml->run->slack == 'true') && (isset($xml->slackConfig))) {
+        if (!isset($this->config->run->slack) || ($this->config->run->slack == 'true') && (isset($this->config->slackConfig))) {
             $settings = [
-                'username' => strval($xml->slackConfig->username),
-                'channel' => strval($xml->slackConfig->channel),
-                'icon' => strval($xml->slackConfig->icon)
+                'username' => strval($this->config->slackConfig->username),
+                'channel' => strval($this->config->slackConfig->channel),
+                'icon' => strval($this->config->slackConfig->icon)
             ];
 
-            $client = new Client(strval($xml->slackConfig->url), $settings);
+            $client = new Client(strval($this->config->slackConfig->url), $settings);
             $client->send('Commit *' . $author[0] . '*: ' . $message . '');
         }
     }

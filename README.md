@@ -12,12 +12,9 @@ composer.json
 ```bash
 "require-dev": {
     ...
-    "jv-testes/pre-commit-note": "1.0.7"
+    "jv-testes/pre-commit-note": ">=1.0.7"
 }
 ```
-
-`php composer.phar update jv-testes/pre-commit-note 1.0.7`
-
 
 **USAGE:**
 
@@ -33,6 +30,23 @@ Edit composer.json and add:
         "post-install-cmd": "PreCommitNote\\Composer\\Script\\Hooks::postHooks"
     }
 ```
+
+**Enable slack**
+
+Edit config.xml
+
+    ...
+    <run>
+        <slack>true</slack>
+    </run>
+    
+    <slackConfig>
+        <username>webhookbot</username>
+        <channel>#channel</channel>
+        <icon>:scissors:</icon>
+        <url>https://hooks.slack.com/services/YOU/KEY</url>
+    </slackConfig>
+    ...
 
 Remembering to set up the hooks
 

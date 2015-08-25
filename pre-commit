@@ -1,0 +1,10 @@
+#!/usr/bin/php
+
+<?php
+
+require_once "/Users/Coderockr/Dev/planrockr/Backend/vendor/autoload.php";
+
+use PreCommitNote\Composer\Script\CodeQualityToolNote;
+
+$console = new CodeQualityToolNote('Code Quality Tool Note', '1.0.0');
+$console->run();
