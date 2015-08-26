@@ -39,6 +39,10 @@ class Hooks extends PreCommitHooks
     {
         $load = strval(static::config()->dir->vendor).DIRECTORY_SEPARATOR.'autoload.php';
 
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $load = str_replace('\\', '\\\\', $load);
+    }
+
         $hook = <<< EOT
 #!/usr/bin/php
 

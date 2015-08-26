@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use PreCommit\Composer\Script\CodeQualityTool;
 use Maknz\Slack\Client;
+use PreCommitNote\Composer\Script\Prompt;
 
 class CodeQualityToolNote extends CodeQualityTool
 {
@@ -19,7 +20,7 @@ class CodeQualityToolNote extends CodeQualityTool
         $errorJS = 0;
         $errorPHP = 0;
         $warningPHP = 0;
-        
+
         $output->writeln('<fg=white;options=bold;bg=red>Code Quality Tool Note</fg=white;options=bold;bg=red>');
         $output->writeln('<info>Fetching files</info>');
         $files = $this->extractCommitedFiles();
@@ -45,7 +46,7 @@ class CodeQualityToolNote extends CodeQualityTool
         $codeStylePsr = $this->codeStylePsr($files);
         if ($codeStylePsr !== true) {
             $this->output->writeln(sprintf('<error>%s</error>', $codeStylePsr));
-            
+
             $pos = strpos($codeStylePsr, 'FOUND');
             $rest = substr($codeStylePsr, $pos, 100);
             $explode = explode(' ', $rest);
@@ -89,49 +90,38 @@ class CodeQualityToolNote extends CodeQualityTool
         $author = null;
         exec('git config --get user.name', $author);
 
-        $message = 'note *A*. Good work!';
+        $message = 'Rating *A*. Good work!';
         
         if (($errorPHP >= 1) || ($errorJS >= 1) || ($warningPHP >= 1)) {
-            $message = 'note *B*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
+            $message = 'Rating *B*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
         }
 
         if (count($fatalError) >= 1) {
-            $message = 'note *C*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
+            $message = 'Rating *C*. warnings (`'.$warningPHP.'` in PHP) errors (`'.$errorJS.'` in JS, `'.$errorPHP.'` in PHP)';
         }
 
         if (preg_match("/(\*B\*)|(\*C\*)/", $message)) {
-            $shell = '
-            exec < /dev/tty
-            while true; do
-              read -p "There were some errors in the test, do you still want to commit? (Y/n) " yn
-              if [ "$yn" = "" ]; then
-                yn="Y"
-              fi
-              case $yn in
-                  [Yy] )
-                        echo $yn
-                        break
-                    ;;
-                  [Nn] )
-                        echo $yn
-                        exit 1
-                    ;;
-              esac
-            done
-            ';
+            $output->write('<question>There were some errors in the test, do you still want to commit? (Y/n)</question>: ');
+            do {
+                $cmdline = new Prompt();
+                $return = strtoupper($cmdline->get());
+                
+                if ($return !== 'N' || $return !== 'Y') {
+                    $output->write('<bg=red>Invalid response! Y for yes, N for no</>: ');
+                }
 
-            $return = strtolower(trim(shell_exec($shell)));
+                if ($return === 'N') {
+                    throw new \Exception("\n###### Commit Aborted! #######\n");
+                }
+            } while ($return !== 'Y');
 
-            if ($return === 'n') {
-                throw new \Exception("\n###### Commit Aborted! #######\n");
-            }
         }
 
         $msgOut = str_replace('`', '', str_replace('*', '', $message));
         
         $output->writeln('<info>Commit '.$author[0].':'.$msgOut.'</info>');
         
-        if (!isset($this->config->run->slack) || ($this->config->run->slack == 'true') && (isset($this->config->slackConfig))) {
+        if (isset($this->config->run->slack) && ($this->config->run->slack == 'true') && (isset($this->config->slackConfig))) {
             $settings = [
                 'username' => strval($this->config->slackConfig->username),
                 'channel' => strval($this->config->slackConfig->channel),
