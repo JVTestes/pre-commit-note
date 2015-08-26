@@ -8,7 +8,7 @@ class Prompt
 
     public function __construct() {
         if (substr(PHP_OS, 0, 3) == "WIN") {
-            $this->tty = fopen("\con", "rb");
+            $this->tty = fopen("\CON", "rb");
         } else {
             if (!($this->tty = fopen("/dev/tty", "r"))) {
                 $this->tty = fopen("php://stdin", "r");

@@ -103,6 +103,10 @@ class CodeQualityToolNote extends CodeQualityTool
         if (preg_match("/(\*B\*)|(\*C\*)/", $message)) {
             $output->write('<question>There were some errors in the test, do you still want to commit? (Y/n)</question>: ');
             do {
+                set_time_limit(0);
+                @ob_end_flush();
+                ob_implicit_flush(true);
+                
                 $cmdline = new Prompt();
                 $return = strtoupper($cmdline->get());
                 
